@@ -60,4 +60,24 @@ public class ConfigManager
     {
         return Config.GetValue<int>("Connector:MaxRetry");
     }
+    
+    public string GetMatrixUri()
+    {
+        return Config.GetValue<string>("Matrix:Uri") ?? "";
+    }
+
+    public string GetMatrixUsername()
+    {
+        return Config.GetValue<string>("Matrix:Username") ?? "";
+    }
+
+    public string GetMatrixPassword()
+    {
+        return Config.GetValue<string>("Matrix:Password") ?? "";
+    }
+
+    public string GetMatrixRoomId()
+    {
+        return Config.GetValue<string>("Matrix:RoomId") ?? "";
+    }
 }

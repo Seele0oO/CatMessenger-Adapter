@@ -1,5 +1,6 @@
 ﻿using CatMessenger.Matrix.Config;
 using CatMessenger.Matrix.Connector;
+using CatMessenger.Matrix.Matrix;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,6 +21,7 @@ builder.Logging.ClearProviders()
 
 builder.Services.AddSingleton<ConfigManager>();
 builder.Services.AddSingleton<RabbitMQConnector>();
+builder.Services.AddHostedService<MatrixClient>();
 
 using var host = builder.Build();
 

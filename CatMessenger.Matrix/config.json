@@ -8,5 +8,11 @@
         "Username": "guest",
         "Password": "guest",
         "MaxRetry": 5
+    },
+    "Matrix": {
+        "Uri": "https://matrix.org",
+        "Username": "",
+        "Password": "",
+        "RoomId": ""
     }
 }

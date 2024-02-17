@@ -13,6 +13,8 @@ public class RabbitMQConnector : IDisposable
     {
         Config = config;
         Logger = logger;
+
+        Connect();
     }
 
     public static string ExchangeName { get; } = "catmessenger";
@@ -33,7 +35,7 @@ public class RabbitMQConnector : IDisposable
     
     public delegate void Handle(ConnectorMessage message);
 
-    public event Handle Handlers;
+    public event Handle OnMessage;
 
     public void Dispose()
     {
@@ -52,28 +54,28 @@ public class RabbitMQConnector : IDisposable
         };
     }
 
-    private async Task CreateChannel()
+    private void CreateChannel()
     {
         CreateFactory();
 
-        using var connection = await Factory!.CreateConnectionAsync();
-        Channel = await connection.CreateChannelAsync();
+        using var connection = Factory!.CreateConnection();
+        Channel = connection.CreateChannel();
     }
 
-    public async Task Connect()
+    public void Connect()
     {
         if (Channel is null || !Channel.IsOpen)
         {
             DisposeChannel();
-            await CreateChannel();
+            CreateChannel();
         }
 
-        await Channel.ExchangeDeclareAsync(ExchangeName, ExchangeType, true, false, null);
-        var queue = await Channel.QueueDeclareAsync();
+        Channel!.ExchangeDeclare(ExchangeName, ExchangeType, true, false, null);
+        var queue = Channel.QueueDeclare();
         QueueName = queue.QueueName;
-        await Channel.QueueBindAsync(QueueName, ExchangeName, RoutingKey);
+        Channel.QueueBind(QueueName, ExchangeName, RoutingKey);
 
-        await Channel.BasicConsumeAsync(QueueName, true, new Consumer(this));
+        Channel.BasicConsume(QueueName, true, new Consumer(this));
     }
 
     private class Consumer : DefaultBasicConsumer
@@ -103,7 +105,7 @@ public class RabbitMQConnector : IDisposable
 
             try
             {
-                Connector.Handlers.Invoke(message);
+                Connector.OnMessage.Invoke(message);
             }
             catch (Exception ex)
             {
@@ -157,7 +159,8 @@ public class RabbitMQConnector : IDisposable
 
             if (Channel is null || !Channel.IsOpen)
             {
-                await Connect();
+                DisposeChannel();
+                Connect();
             }
 
             await Channel!.BasicPublishAsync(ExchangeName, RoutingKey, Encoding.UTF8.GetBytes(json));

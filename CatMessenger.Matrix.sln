@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatMessenger.Matrix", "CatMessenger.Matrix\CatMessenger.Matrix.csproj", "{685DBC9B-4CDE-4149-A420-5599B87B5EDD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{685DBC9B-4CDE-4149-A420-5599B87B5EDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{685DBC9B-4CDE-4149-A420-5599B87B5EDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{685DBC9B-4CDE-4149-A420-5599B87B5EDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{685DBC9B-4CDE-4149-A420-5599B87B5EDD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
