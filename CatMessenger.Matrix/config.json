@@ -1,0 +1,12 @@
+{
+    "Debug": false,
+    "Name": "Matrix",
+    "Connector": {
+        "Host": "localhost",
+        "Port": 5672,
+        "VirtualHost": "/minecraft",
+        "Username": "guest",
+        "Password": "guest",
+        "MaxRetry": 5
+    }
+}
