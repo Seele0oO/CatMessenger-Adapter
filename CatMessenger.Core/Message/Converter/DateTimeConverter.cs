@@ -14,7 +14,15 @@ public class DateTimeConverter : JsonConverter<DateTime>
     public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue,
         JsonSerializer serializer)
     {
-        var v = reader.ReadAsString();
-        return DateTime.Parse(v!);
+        if (reader.TokenType == JsonToken.String)
+        {
+            var v = JToken.Load(reader);
+            if (v.Type == JTokenType.String)
+            {
+                return DateTime.Parse(v.ToString());
+            }
+        }
+
+        return DateTime.Now;
     }
 }

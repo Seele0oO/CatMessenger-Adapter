@@ -7,7 +7,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace CatMessenger.Telegram.Utilities;
 
-public class MessageParser
+public class UpdateMessageHelper
 {
     public static ConnectorMessage FromUpdate(Update update)
     {

@@ -1,9 +1,8 @@
-﻿using CatMessenger.Core.Message;
-using CatMessenger.Core.Message.MessageType;
+﻿using CatMessenger.Core.Message.MessageType;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace CatMessenger.Matrix.Message.Converter
+namespace CatMessenger.Core.Message.Converter
 {
     public class AbstractMessageConverter : JsonConverter<AbstractMessage>
     {
@@ -32,8 +31,13 @@ namespace CatMessenger.Matrix.Message.Converter
             bool hasExistingValue,
             JsonSerializer serializer)
         {
-            var jObj = JObject.Load(reader);
+            if (reader.TokenType != JsonToken.StartObject)
+            {
+                return null;
+            }
 
+            var jObj = JObject.Load(reader);
+            
             if (hasExistingValue)
             {
                 existingValue!.Read(jObj);

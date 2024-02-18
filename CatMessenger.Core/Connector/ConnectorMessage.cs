@@ -1,13 +1,13 @@
 ﻿using CatMessenger.Core.Message;
 using CatMessenger.Core.Message.Converter;
-using CatMessenger.Matrix.Message.Converter;
 using Newtonsoft.Json;
 
 namespace CatMessenger.Core.Connector;
 
 public class ConnectorMessage
 {
-    [JsonProperty("client")] public string Client { get; set; }
+    [JsonProperty("client")]
+    public string Client { get; set; }
 
     [JsonProperty("content")]
     [JsonConverter(typeof(AbstractMessageConverter))]
@@ -15,8 +15,8 @@ public class ConnectorMessage
 
     [JsonProperty("sender")]
     [JsonConverter(typeof(AbstractMessageConverter))]
-    public AbstractMessage Sender { get; set; }
-
+    public AbstractMessage? Sender { get; set; }
+    
     [JsonProperty("time")]
     [JsonConverter(typeof(DateTimeConverter))]
     public DateTime? Time { get; set; }

@@ -91,8 +91,9 @@ public class RabbitMqConnector : IDisposable
             }
 
             var json = Encoding.UTF8.GetString(body.ToArray());
+            
             var message = JsonConvert.DeserializeObject<ConnectorMessage>(json);
-
+            
             if (message.Client == Connector.Config.GetName())
             {
                 return;
@@ -149,7 +150,7 @@ public class RabbitMqConnector : IDisposable
             if (Channel is null || !Channel.IsOpen)
             {
                 DisposeChannel();
-                Connect();
+                await Connect();
             }
 
             await Channel!.BasicPublishAsync(ExchangeName, RoutingKey, Encoding.UTF8.GetBytes(json));

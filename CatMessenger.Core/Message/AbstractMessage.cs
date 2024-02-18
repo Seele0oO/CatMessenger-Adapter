@@ -1,4 +1,4 @@
-﻿using CatMessenger.Matrix.Message.Converter;
+﻿using CatMessenger.Core.Message.Converter;
 using Newtonsoft.Json.Linq;
 
 namespace CatMessenger.Core.Message;
