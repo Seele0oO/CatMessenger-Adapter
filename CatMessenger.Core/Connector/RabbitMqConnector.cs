@@ -1,15 +1,15 @@
 ﻿using System.Text;
-using CatMessenger.Matrix.Config;
+using CatMessenger.Core.Config;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using ConnectionFactory = RabbitMQ.Client.ConnectionFactory;
 
-namespace CatMessenger.Matrix.Connector;
+namespace CatMessenger.Core.Connector;
 
-public class RabbitMQConnector : IDisposable
+public class RabbitMqConnector : IDisposable
 {
-    public RabbitMQConnector(ConfigManager config, ILogger<RabbitMQConnector> logger)
+    public RabbitMqConnector(IConfigProvider config, ILogger<RabbitMqConnector> logger)
     {
         Config = config;
         Logger = logger;
@@ -19,9 +19,9 @@ public class RabbitMQConnector : IDisposable
     public static string ExchangeType { get; } = "fanout";
     public static string RoutingKey { get; } = "";
 
-    private ConfigManager Config { get; }
+    private IConfigProvider Config { get; }
 
-    private ILogger<RabbitMQConnector> Logger { get; }
+    private ILogger<RabbitMqConnector> Logger { get; }
 
     private ConnectionFactory? Factory { get; set; }
     private IConnection? Connection { get; set; }
@@ -53,31 +53,31 @@ public class RabbitMQConnector : IDisposable
         };
     }
 
-    private void CreateChannel()
+    private async Task CreateChannel()
     {
         CreateFactory();
 
-        Connection = Factory!.CreateConnection();
-        Channel = Connection.CreateChannel();
+        Connection = await Factory!.CreateConnectionAsync();
+        Channel = await Connection.CreateChannelAsync();
     }
 
-    public void Connect()
+    public async Task Connect()
     {
-        CreateChannel();
+        await CreateChannel();
         
-        Channel?.ExchangeDeclare(ExchangeName, ExchangeType, true, false, null);
-        var queue = Channel.QueueDeclare();
+        await Channel.ExchangeDeclareAsync(ExchangeName, ExchangeType, true, false, null);
+        var queue = await Channel.QueueDeclareAsync();
         QueueName = queue.QueueName;
-        Channel.QueueBind(QueueName, ExchangeName, RoutingKey);
+        await Channel.QueueBindAsync(QueueName, ExchangeName, RoutingKey);
 
-        Channel.BasicConsume(QueueName, true, new Consumer(this));
+        await Channel.BasicConsumeAsync(QueueName, true, new Consumer(this));
     }
 
     private class Consumer : DefaultBasicConsumer
     {
-        private RabbitMQConnector Connector { get; }
+        private RabbitMqConnector Connector { get; }
         
-        public Consumer(RabbitMQConnector connector)
+        public Consumer(RabbitMqConnector connector)
         {
             Connector = connector;
         }
@@ -126,11 +126,7 @@ public class RabbitMQConnector : IDisposable
     public async Task Publish(ConnectorMessage message)
     {
         message.Client = Config.GetName();
-
-        if (message.Time == null)
-        {
-            message.Time = DateTime.Now;
-        }
+        message.Time ??= DateTime.Now;
 
         var json = JsonConvert.SerializeObject(message);
         await InternalPublish(json, 0);

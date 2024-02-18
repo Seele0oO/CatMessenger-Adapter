@@ -1,4 +1,4 @@
-﻿using CatMessenger.Matrix.Message;
+﻿using CatMessenger.Core.Message;
 
 namespace CatMessenger.Matrix.Utilities;
 

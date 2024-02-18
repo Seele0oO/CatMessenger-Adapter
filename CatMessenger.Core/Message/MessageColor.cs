@@ -1,4 +1,4 @@
-﻿namespace CatMessenger.Matrix.Message;
+﻿namespace CatMessenger.Core.Message;
 
 public class MessageColor
 {

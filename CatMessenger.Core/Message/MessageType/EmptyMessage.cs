@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace CatMessenger.Matrix.Message.MessageType;
+namespace CatMessenger.Core.Message.MessageType;
 
-public class NewlineMessage : AbstractMessage
+public class EmptyMessage : AbstractMessage
 {
     public override string GetType()
     {
-        return "newline";
+        return "empty";
     }
 
     public override JObject WriteData()

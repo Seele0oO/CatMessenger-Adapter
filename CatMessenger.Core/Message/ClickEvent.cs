@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace CatMessenger.Matrix.Message;
+namespace CatMessenger.Core.Message;
 
 public enum ClickEvent
 {

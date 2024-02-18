@@ -1,8 +1,9 @@
-﻿using CatMessenger.Matrix.Message;
+﻿using CatMessenger.Core.Message;
+using CatMessenger.Core.Message.Converter;
 using CatMessenger.Matrix.Message.Converter;
 using Newtonsoft.Json;
 
-namespace CatMessenger.Matrix.Connector;
+namespace CatMessenger.Core.Connector;
 
 public class ConnectorMessage
 {

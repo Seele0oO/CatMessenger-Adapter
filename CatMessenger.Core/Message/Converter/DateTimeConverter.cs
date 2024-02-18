@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace CatMessenger.Matrix.Message.Converter;
+namespace CatMessenger.Core.Message.Converter;
 
 public class DateTimeConverter : JsonConverter<DateTime>
 {

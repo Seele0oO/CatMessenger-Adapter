@@ -1,9 +1,9 @@
 ﻿using CatMessenger.Core.Config;
 using Microsoft.Extensions.Configuration;
 
-namespace CatMessenger.Matrix.Config;
+namespace CatMessenger.Telegram.Config;
 
-public class ConfigManager(IConfiguration config) : IConfigProvider
+public class ConfigProvider(IConfiguration config) : IConfigProvider
 {
     public static string GetDevEnvironmentVariable()
     {
@@ -14,6 +14,26 @@ public class ConfigManager(IConfiguration config) : IConfigProvider
     {
         return GetDevEnvironmentVariable().Equals("Development", StringComparison.OrdinalIgnoreCase);
     }
+    
+    public string GetTelegramToken()
+    {
+        return config.GetValue<string>("Telegram:Token") ?? "";
+    }
+    
+    public bool IsTelegramProxyEnabled()
+    {
+        return config.GetValue<bool>("Telegram:Proxy:Enabled");
+    }
+
+    public string GetTelegramProxyUrl()
+    {
+        return config.GetValue<string>("Telegram:Proxy:Url") ?? "";
+    }
+    
+    public string GetTelegramChatId()
+    {
+        return config.GetValue<string>("Telegram:ChatId")!;
+    }
 
     public bool IsDebug()
     {
@@ -22,9 +42,9 @@ public class ConfigManager(IConfiguration config) : IConfigProvider
 
     public string GetName()
     {
-        return config.GetValue<string>("Name") ?? "";
+        return config.GetValue<string>("Name")!;
     }
-
+    
     public string GetConnectorHost()
     {
         return config.GetValue<string>("Connector:Host") ?? "";
@@ -53,25 +73,5 @@ public class ConfigManager(IConfiguration config) : IConfigProvider
     public int GetConnectorMaxRetry()
     {
         return config.GetValue<int>("Connector:MaxRetry");
-    }
-    
-    public string GetMatrixUri()
-    {
-        return config.GetValue<string>("Matrix:Uri") ?? "";
-    }
-
-    public string GetMatrixUsername()
-    {
-        return config.GetValue<string>("Matrix:Username") ?? "";
-    }
-
-    public string GetMatrixPassword()
-    {
-        return config.GetValue<string>("Matrix:Password") ?? "";
-    }
-
-    public string GetMatrixRoomId()
-    {
-        return config.GetValue<string>("Matrix:RoomId") ?? "";
     }
 }

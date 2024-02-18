@@ -1,5 +1,6 @@
-﻿using CatMessenger.Matrix.Config;
-using CatMessenger.Matrix.Connector;
+﻿using CatMessenger.Core.Config;
+using CatMessenger.Core.Connector;
+using CatMessenger.Matrix.Config;
 using CatMessenger.Matrix.Matrix;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,11 @@ builder.Logging.ClearProviders()
     .SetMinimumLevel(LogLevel.Trace)
     .AddNLog();
 
-builder.Services.AddSingleton<ConfigManager>();
-builder.Services.AddSingleton<RabbitMQConnector>();
+var config = new ConfigManager(builder.Configuration);
+builder.Services.AddSingleton<IConfigProvider>(config);
+builder.Services.AddSingleton(config);
+
+builder.Services.AddSingleton<RabbitMqConnector>();
 builder.Services.AddHostedService<MatrixClient>();
 
 using var host = builder.Build();

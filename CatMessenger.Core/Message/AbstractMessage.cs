@@ -1,7 +1,7 @@
 ﻿using CatMessenger.Matrix.Message.Converter;
 using Newtonsoft.Json.Linq;
 
-namespace CatMessenger.Matrix.Message;
+namespace CatMessenger.Core.Message;
 
 public abstract class AbstractMessage
 {

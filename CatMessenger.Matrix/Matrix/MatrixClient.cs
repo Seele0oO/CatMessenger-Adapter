@@ -1,5 +1,5 @@
-﻿using CatMessenger.Matrix.Config;
-using CatMessenger.Matrix.Connector;
+﻿using CatMessenger.Core.Connector;
+using CatMessenger.Matrix.Config;
 using CatMessenger.Matrix.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,12 +9,12 @@ namespace CatMessenger.Matrix.Matrix;
 public class MatrixClient : IHostedService
 {
     private ConfigManager Config { get; }
-    private RabbitMQConnector Connector { get; }
+    private RabbitMqConnector Connector { get; }
     private ILogger<MatrixClient> Logger { get; }
     
     private MatrixBot.Sdk.MatrixBot Bot { get; set; }
 
-    public MatrixClient(ConfigManager config, RabbitMQConnector connector, ILogger<MatrixClient> logger)
+    public MatrixClient(ConfigManager config, RabbitMqConnector connector, ILogger<MatrixClient> logger)
     {
         Config = config;
         Connector = connector;
@@ -46,11 +46,10 @@ public class MatrixClient : IHostedService
         };
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        Connector.Connect();
+        await Connector.Connect();
         Bot.Start();
-        return Task.CompletedTask;
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

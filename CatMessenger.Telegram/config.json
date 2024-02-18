@@ -1,0 +1,20 @@
+{
+    "Debug": false,
+    "Name": "TelegramBridge",
+    "Connector": {
+        "Host": "localhost",
+        "Port": 5672,
+        "VirtualHost": "/minecraft",
+        "Username": "guest",
+        "Password": "guest",
+        "MaxRetry": 5
+    },
+    "Telegram": {
+        "Token": "",
+        "Proxy": {
+            "Enabled": false,
+            "Url": "socks5://localhost:10808"
+        },
+        "ChatId": ""
+    }
+}
