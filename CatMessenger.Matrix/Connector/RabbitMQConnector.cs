@@ -13,8 +13,6 @@ public class RabbitMQConnector : IDisposable
     {
         Config = config;
         Logger = logger;
-
-        Connect();
     }
 
     public static string ExchangeName { get; } = "catmessenger";
@@ -26,6 +24,7 @@ public class RabbitMQConnector : IDisposable
     private ILogger<RabbitMQConnector> Logger { get; }
 
     private ConnectionFactory? Factory { get; set; }
+    private IConnection? Connection { get; set; }
 
     private IChannel? Channel { get; set; }
 
@@ -58,19 +57,15 @@ public class RabbitMQConnector : IDisposable
     {
         CreateFactory();
 
-        using var connection = Factory!.CreateConnection();
-        Channel = connection.CreateChannel();
+        Connection = Factory!.CreateConnection();
+        Channel = Connection.CreateChannel();
     }
 
     public void Connect()
     {
-        if (Channel is null || !Channel.IsOpen)
-        {
-            DisposeChannel();
-            CreateChannel();
-        }
-
-        Channel!.ExchangeDeclare(ExchangeName, ExchangeType, true, false, null);
+        CreateChannel();
+        
+        Channel?.ExchangeDeclare(ExchangeName, ExchangeType, true, false, null);
         var queue = Channel.QueueDeclare();
         QueueName = queue.QueueName;
         Channel.QueueBind(QueueName, ExchangeName, RoutingKey);
@@ -116,12 +111,10 @@ public class RabbitMQConnector : IDisposable
 
     private void DisposeChannel()
     {
-        if (Channel is not null)
+        if (Channel is not null && Channel.IsOpen)
         {
-            if (Channel.IsOpen)
-            {
-                Channel.Dispose();
-            }
+            Channel.Dispose();
+            Connection?.Dispose();
         }
     }
 

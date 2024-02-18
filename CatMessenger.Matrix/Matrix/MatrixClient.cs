@@ -48,13 +48,14 @@ public class MatrixClient : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        Connector.Connect();
         Bot.Start();
         return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
         Bot.Stop();
-        return Task.CompletedTask;
+        await Connector.Disconnect();
     }
 }
