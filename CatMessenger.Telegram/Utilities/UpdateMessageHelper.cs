@@ -156,7 +156,7 @@ public class UpdateMessageHelper
     {
         return new TextMessage
         {
-            Text = $"[贴纸 {sticker.Emoji}]",
+            Text = $"[贴纸 {sticker.Emoji}] ",
             Color = MessageColor.Green,
             Hover = new TextMessage
             {
@@ -190,21 +190,24 @@ public class UpdateMessageHelper
         {
             var reply = message.ReplyToMessage;
 
+            var hover = GetText(reply.Text ?? reply.Caption);
             var replyMsg = new TextMessage
             {
                 Text = "[回复：",
                 Color = MessageColor.Gold,
-                Hover = GetText(reply.Text ?? reply.Caption)
+                Hover = hover
             };
 
             var from = GetFromUser(reply.From);
             from.Color = MessageColor.Gold;
+            from.Hover = hover;
             replyMsg.Extras.Add(from);
             
             replyMsg.Extras.Add(new TextMessage 
             {
                 Text = "] ",
-                Color = MessageColor.Gold
+                Color = MessageColor.Gold,
+                Hover = hover
             });
             
             chatMsg.Extras.Add(replyMsg);
@@ -250,20 +253,9 @@ public class UpdateMessageHelper
         {
             chatMsg.Extras.Add(new TextMessage
             {
-                Text = "[图片]",
+                Text = "[图片] ",
                 Color = MessageColor.Green
             });
-            
-            // Fixme: qyl27: Show pictures count?
-            // var count = message.Photo.DistinctBy(photo => photo.FileUniqueId).Count();
-            // if (count == 1)
-            // {
-            //     chatMsg.Append(new ConnectorMessage("[图片] ").WithColor(TextColor.Green));
-            // }
-            // else
-            // {
-            //     chatMsg.Append(new ConnectorMessage($"[图片 * {count}] ").WithColor(TextColor.Green));
-            // }
         }
 
         if (message.Sticker != null)
@@ -275,7 +267,7 @@ public class UpdateMessageHelper
         {
             chatMsg.Extras.Add(new TextMessage
             {
-                Text = $"[文件 {message.Document.FileName}]",
+                Text = $"[文件 {message.Document.FileName}] ",
                 Color = MessageColor.Blue
             });
         }
@@ -284,7 +276,7 @@ public class UpdateMessageHelper
         {
             chatMsg.Extras.Add(new TextMessage
             {
-                Text = $"[语音 {message.Voice.Duration}秒]",
+                Text = $"[语音 {message.Voice.Duration}秒] ",
                 Color = MessageColor.Blue
             });
         }
@@ -293,7 +285,7 @@ public class UpdateMessageHelper
         {
             chatMsg.Extras.Add(new TextMessage
             {
-                Text = $"[音频 {message.Audio.Duration}秒]",
+                Text = $"[音频 {message.Audio.Duration}秒] ",
                 Color = MessageColor.Blue
             });
         }
@@ -302,7 +294,7 @@ public class UpdateMessageHelper
         {
             chatMsg.Extras.Add(new TextMessage
             {
-                Text = $"[视频 {message.Video.Duration}秒]",
+                Text = $"[视频 {message.Video.Duration}秒] ",
                 Color = MessageColor.Blue
             });
         }
@@ -328,7 +320,7 @@ public class UpdateMessageHelper
         {
             Content = new TextMessage
             {
-                Text = $"[不支持的消息 {update.Type}]",
+                Text = $"[不支持的消息 {update.Type}] ",
                 Color = MessageColor.Red
             }
         };
@@ -340,7 +332,7 @@ public class UpdateMessageHelper
         {
             Content = new TextMessage
             {
-                Text = $"[未知消息]",
+                Text = $"[未知消息] ",
                 Color = MessageColor.Red
             }
         };
