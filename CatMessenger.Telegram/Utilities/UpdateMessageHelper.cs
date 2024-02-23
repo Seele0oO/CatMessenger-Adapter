@@ -190,7 +190,7 @@ public class UpdateMessageHelper
         {
             var reply = message.ReplyToMessage;
 
-            var hover = GetText(reply.Text ?? reply.Caption);
+            var hover = GetText(reply.Text ?? reply.Caption ?? string.Empty);
             var replyMsg = new TextMessage
             {
                 Text = "[回复：",

@@ -42,7 +42,7 @@ public class UpdateHandler(
         await connector.Publish(message);
     }
 
-    public Task HandlePollingErrorAsync(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken)
+    public Task HandlePollingErrorAsync(ITelegramBotClient bot, Exception exception, CancellationToken cancellationToken)
     {
         logger.LogWarning(exception, "Polling error!");
         return Task.CompletedTask;

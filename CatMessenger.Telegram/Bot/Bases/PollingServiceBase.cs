@@ -37,7 +37,7 @@ public abstract class PollingServiceBase<TReceiverService> : BackgroundService
                 var receiver = scope.ServiceProvider.GetRequiredService<TReceiverService>();
                 // var receiver = ServiceProvider.GetService<TReceiverService>();
                 
-                await receiver!.ReceiveAsync(stoppingToken);
+                await receiver.ReceiveAsync(stoppingToken);
             }
             catch (Exception ex)
             {
