@@ -5,43 +5,37 @@ using Telegram.Bot;
 
 namespace CatMessenger.Telegram.Bot.Bases;
 
-public abstract class PollingServiceBase<TReceiverService> : BackgroundService
+public abstract class PollingServiceBase<TReceiverService>(
+    IServiceProvider serviceProvider,
+    ILogger<PollingServiceBase<TReceiverService>> logger)
+    : BackgroundService
     where TReceiverService : IReceiverService
 {
-    private IServiceProvider ServiceProvider { get; }
-    private ILogger<PollingServiceBase<TReceiverService>> Logger { get; }
+    private CancellationTokenSource Source { get; } = new();
     
-    protected PollingServiceBase(
-        IServiceProvider serviceProvider,
-        ILogger<PollingServiceBase<TReceiverService>> logger)
-    {
-        ServiceProvider = serviceProvider;
-        Logger = logger;
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Logger.LogInformation("Starting polling service");
+        logger.LogInformation("Starting polling service");
         
         await DoReceive(stoppingToken);
     }
 
     private async Task DoReceive(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!stoppingToken.IsCancellationRequested && !Source.IsCancellationRequested)
         {
             try
             {
                 // Fixme: qyl27: Maybe we needn't multi bot in same host?
-                using var scope = ServiceProvider.CreateScope();
+                using var scope = serviceProvider.CreateScope();
                 var receiver = scope.ServiceProvider.GetRequiredService<TReceiverService>();
                 // var receiver = ServiceProvider.GetService<TReceiverService>();
                 
-                await receiver.ReceiveAsync(stoppingToken);
+                await receiver.ReceiveAsync(Source.Token);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Polling failed!");
+                logger.LogError(ex, "Polling failed!");
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
         }
