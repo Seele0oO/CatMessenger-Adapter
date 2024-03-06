@@ -113,46 +113,171 @@ public class UpdateMessageHelper
         return from;
     }
     
-    public static AbstractMessage GetText(string originText, int trim = -1)
+    // private static AbstractMessage GetText(string originText, int trim = -1)
+    // {
+    //     var message = new EmptyMessage();
+    //
+    //     if (string.IsNullOrWhiteSpace(originText))
+    //     {
+    //         return message;
+    //     }
+    //     
+    //     var text = originText.Replace('\n', ' ');
+    //
+    //     if (trim > 0 && text.Length > trim)
+    //     {
+    //         message.Extras.Add(new TextMessage
+    //         {
+    //             Text = new StringInfo(text).SubstringByTextElements(0, trim) + "……"
+    //         });
+    //         
+    //         message.Extras.Add(new TextMessage
+    //             {
+    //                 Text = "[全文]",
+    //                 Color = MessageColor.Gold,
+    //                 Hover = new TextMessage
+    //                 {
+    //                     Text = text
+    //                 }
+    //             });
+    //     }
+    //     else
+    //     {
+    //         message.Extras.Add(new TextMessage
+    //         {
+    //             Text = text
+    //         });
+    //     }
+    //
+    //     return message;
+    // }
+
+    private static AbstractMessage GetTextFromEntities(MessageEntity[] entities, IEnumerable<string?> entityValues, bool disableHover = false)
     {
         var message = new EmptyMessage();
 
-        if (string.IsNullOrWhiteSpace(originText))
+        if (!entities.Any())
         {
             return message;
         }
-        
-        var text = originText.Replace('\n', ' ');
 
-        if (trim > 0 && text.Length > trim)
+        var values = entityValues.ToList();
+
+        for (var i = 0; i < entities.Length; i++)
         {
-            message.Extras.Add(new TextMessage
+            var entity = entities[i];
+            var value = values[i];
+
+            if (string.IsNullOrWhiteSpace(value))
             {
-                Text = new StringInfo(text).SubstringByTextElements(0, trim) + "……"
-            });
+                continue;
+            }
+
+            var textEntity = new TextMessage
+            {
+                Text = value
+            };
             
-            message.Extras.Add(new TextMessage
-                {
-                    Text = "[全文]",
-                    Color = MessageColor.Gold,
-                    Hover = new TextMessage
-                    {
-                        Text = text
-                    }
-                });
-        }
-        else
-        {
-            message.Extras.Add(new TextMessage
+            switch (entity.Type)
             {
-                Text = text
-            });
+                case MessageEntityType.Mention:
+                case MessageEntityType.TextMention:
+                {
+                    textEntity.Color = MessageColor.Blue;
+                    textEntity.Underline = true;
+
+                    var hover = GetFromUser(entity.User);
+                    if (disableHover)
+                    {
+                        textEntity.Extras.Add(new TextMessage
+                        {
+                            Text = " ("
+                        });
+                        textEntity.Extras.Add(hover);
+                        textEntity.Extras.Add(new TextMessage
+                        {
+                            Text = ") "
+                        });
+                    }
+                    else
+                    {
+                        textEntity.Hover = hover;
+                    }
+                    break;
+                }
+                case MessageEntityType.Url:
+                case MessageEntityType.TextLink:
+                {
+                    
+                    textEntity.Color = MessageColor.Blue;
+                    textEntity.Underline = true;
+
+                    var hover = new TextMessage
+                    {
+                        Text = entity.Url!
+                    };
+                    
+                    if (disableHover)
+                    {
+                        textEntity.Extras.Add(new TextMessage
+                        {
+                            Text = " ("
+                        });
+                        textEntity.Extras.Add(hover);
+                        textEntity.Extras.Add(new TextMessage
+                        {
+                            Text = ") "
+                        });
+                    }
+                    else
+                    {
+                        textEntity.Hover = hover;
+                    }
+                    break;
+                }
+                case MessageEntityType.PhoneNumber:
+                    textEntity.Color = MessageColor.Blue;
+                    break;
+                case MessageEntityType.Hashtag:
+                    textEntity.Color = MessageColor.Blue;
+                    break;
+                case MessageEntityType.Email:
+                    textEntity.Color = MessageColor.Blue;
+                    break;
+                case MessageEntityType.Bold:
+                    textEntity.Bold = true;
+                    break;
+                case MessageEntityType.Italic:
+                    textEntity.Italic = true;
+                    break;
+                case MessageEntityType.Underline:
+                    textEntity.Underline = true;
+                    break;
+                case MessageEntityType.Strikethrough:
+                    textEntity.Strikethrough = true;
+                    break;
+                case MessageEntityType.Spoiler:
+                    textEntity.Spoiler = true;
+                    break;
+                case MessageEntityType.BotCommand:
+                    break;
+                case MessageEntityType.Code:
+                    break;
+                case MessageEntityType.Pre:
+                    break;
+                case MessageEntityType.Cashtag:
+                    break;
+                case MessageEntityType.CustomEmoji:
+                    break;
+            }
+            
+            message.Extras.Add(textEntity);
         }
 
         return message;
     }
 
-    public static AbstractMessage GetSticker(Sticker sticker)
+    private static AbstractMessage GetSticker(Sticker sticker)
     {
         return new TextMessage
         {
@@ -165,7 +290,7 @@ public class UpdateMessageHelper
         };
     }
     
-    public static ConnectorMessage FromMessage(Message message, bool edited = false)
+    private static ConnectorMessage FromMessage(Message message, bool edited = false)
     {
         var msg = new ConnectorMessage();
         var chatMsg = new EmptyMessage();
@@ -190,23 +315,26 @@ public class UpdateMessageHelper
         {
             var reply = message.ReplyToMessage;
 
-            var hover = GetText(reply.Text ?? reply.Caption ?? string.Empty);
+            var hover = GetTextFromEntities(reply.Entities ?? reply.CaptionEntities ?? [], 
+                reply.EntityValues ?? reply.CaptionEntityValues ?? [], 
+                true);
+            
             var replyMsg = new TextMessage
             {
                 Text = "[回复：",
-                Color = MessageColor.Gold,
+                Color = MessageColor.LightPurple,
                 Hover = hover
             };
 
             var from = GetFromUser(reply.From);
-            from.Color = MessageColor.Gold;
+            from.Color = MessageColor.Aqua;
             from.Hover = hover;
             replyMsg.Extras.Add(from);
             
             replyMsg.Extras.Add(new TextMessage 
             {
                 Text = "] ",
-                Color = MessageColor.Gold,
+                Color = MessageColor.LightPurple,
                 Hover = hover
             });
             
@@ -299,22 +427,32 @@ public class UpdateMessageHelper
             });
         }
 
-        if (message.Text != null)
+        if (message.Entities is not null)
         {
-            chatMsg.Extras.Add(GetText(message.Text, 30));
+            chatMsg.Extras.Add(GetTextFromEntities(message.Entities, message.EntityValues!));
         }
 
-        if (message.Caption != null)
+        if (message.CaptionEntities is not null)
         {
-            chatMsg.Extras.Add(GetText(message.Caption, 30));
+            chatMsg.Extras.Add(GetTextFromEntities(message.CaptionEntities, message.CaptionEntityValues!));
         }
+
+        // if (message.Text != null)
+        // {
+        //     chatMsg.Extras.Add(GetText(message.Text, 30));
+        // }
+        //
+        // if (message.Caption != null)
+        // {
+        //     chatMsg.Extras.Add(GetText(message.Caption, 30));
+        // }
 
         msg.Content = chatMsg;
         
         return msg;
     }
     
-    public static ConnectorMessage FromUnsupported(Update update)
+    private static ConnectorMessage FromUnsupported(Update update)
     {
         return new ConnectorMessage
         {
@@ -326,7 +464,7 @@ public class UpdateMessageHelper
         };
     }
     
-    public static ConnectorMessage FromUnknown(Update update)
+    private static ConnectorMessage FromUnknown(Update update)
     {
         return new ConnectorMessage
         {
