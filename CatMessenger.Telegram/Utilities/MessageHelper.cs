@@ -37,7 +37,7 @@ public class MessageHelper
         }
         if (message is TranslatableMessage translatableMessage)
         {
-            result.Append(string.Format(translatableMessage.Key, translatableMessage.Args.ToArray()));
+            result.Append(string.Format(translatableMessage.Key, translatableMessage.Args.Select<string, object?>(s => s).ToArray()));
         }
         if (message is NewlineMessage newlineMessage)
         {

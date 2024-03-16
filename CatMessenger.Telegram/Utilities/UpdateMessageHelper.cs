@@ -113,44 +113,24 @@ public class UpdateMessageHelper
         return from;
     }
     
-    // private static AbstractMessage GetText(string originText, int trim = -1)
-    // {
-    //     var message = new EmptyMessage();
-    //
-    //     if (string.IsNullOrWhiteSpace(originText))
-    //     {
-    //         return message;
-    //     }
-    //     
-    //     var text = originText.Replace('\n', ' ');
-    //
-    //     if (trim > 0 && text.Length > trim)
-    //     {
-    //         message.Extras.Add(new TextMessage
-    //         {
-    //             Text = new StringInfo(text).SubstringByTextElements(0, trim) + "……"
-    //         });
-    //         
-    //         message.Extras.Add(new TextMessage
-    //             {
-    //                 Text = "[全文]",
-    //                 Color = MessageColor.Gold,
-    //                 Hover = new TextMessage
-    //                 {
-    //                     Text = text
-    //                 }
-    //             });
-    //     }
-    //     else
-    //     {
-    //         message.Extras.Add(new TextMessage
-    //         {
-    //             Text = text
-    //         });
-    //     }
-    //
-    //     return message;
-    // }
+    private static AbstractMessage GetText(string originText)
+    {
+        var message = new EmptyMessage();
+    
+        if (string.IsNullOrWhiteSpace(originText))
+        {
+            return message;
+        }
+        
+        var text = originText.Replace('\n', ' ');
+    
+        message.Extras.Add(new TextMessage
+        {
+            Text = text
+        });
+    
+        return message;
+    }
 
     private static AbstractMessage GetTextFromEntities(MessageEntity[] entities, IEnumerable<string?> entityValues, bool disableHover = false)
     {
@@ -260,14 +240,11 @@ public class UpdateMessageHelper
                     textEntity.Spoiler = true;
                     break;
                 case MessageEntityType.BotCommand:
-                    break;
                 case MessageEntityType.Code:
-                    break;
                 case MessageEntityType.Pre:
-                    break;
                 case MessageEntityType.Cashtag:
-                    break;
                 case MessageEntityType.CustomEmoji:
+                default:
                     break;
             }
             
@@ -427,25 +404,25 @@ public class UpdateMessageHelper
             });
         }
 
-        if (message.Entities is not null)
-        {
-            chatMsg.Extras.Add(GetTextFromEntities(message.Entities, message.EntityValues!));
-        }
-
-        if (message.CaptionEntities is not null)
-        {
-            chatMsg.Extras.Add(GetTextFromEntities(message.CaptionEntities, message.CaptionEntityValues!));
-        }
-
-        // if (message.Text != null)
+        // if (message.Entities is not null && message.Entities.Length > 0)
         // {
-        //     chatMsg.Extras.Add(GetText(message.Text, 30));
+        //     chatMsg.Extras.Add(GetTextFromEntities(message.Entities, message.EntityValues!));
         // }
         //
-        // if (message.Caption != null)
+        // if (message.CaptionEntities is not null && message.CaptionEntities.Length > 0)
         // {
-        //     chatMsg.Extras.Add(GetText(message.Caption, 30));
+        //     chatMsg.Extras.Add(GetTextFromEntities(message.CaptionEntities, message.CaptionEntityValues!));
         // }
+
+        if (message.Text != null)
+        {
+            chatMsg.Extras.Add(GetText(message.Text));
+        }
+        
+        if (message.Caption != null)
+        {
+            chatMsg.Extras.Add(GetText(message.Caption));
+        }
 
         msg.Content = chatMsg;
         
