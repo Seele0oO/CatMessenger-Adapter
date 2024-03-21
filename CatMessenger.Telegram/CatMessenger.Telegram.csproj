@@ -9,7 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CrystalConnector.Client" Version="1.0.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
       <PackageReference Include="NLog.Extensions.Hosting" Version="5.3.8" />
