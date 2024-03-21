@@ -1,0 +1,78 @@
+name: Build and Release on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet publish -c Release
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      # Tar and upload CatMessenger.Core artifacts
+      - name: Tar build CatMessenger.Core artifacts
+        run: tar -czf CatMessenger.Core.tar.gz ./CatMessenger.Core/bin/Release/net8.0/publish
+
+      - name: Upload CatMessenger.Core Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: CatMessenger.Core.tar.gz
+          asset_name: CatMessenger.Core.tar.gz
+          asset_content_type: application/gzip
+
+      # Tar and upload CatMessenger.Matrix artifacts
+      - name: Tar build CatMessenger.Matrix artifacts
+        run: tar -czf CatMessenger.Matrix.tar.gz ./CatMessenger.Matrix/bin/Release/net8.0/publish
+
+      - name: Upload CatMessenger.Matrix Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: CatMessenger.Matrix.tar.gz
+          asset_name: CatMessenger.Matrix.tar.gz
+          asset_content_type: application/gzip
+
+      # Tar and upload CatMessenger.Telegram artifacts
+      - name: Tar build CatMessenger.Telegram artifacts
+        run: tar -czf CatMessenger.Telegram.tar.gz ./CatMessenger.Telegram/bin/Release/net8.0/publish
+
+      - name: Upload CatMessenger.Telegram Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: CatMessenger.Telegram.tar.gz
+          asset_name: CatMessenger.Telegram.tar.gz
+          asset_content_type: application/gzip
