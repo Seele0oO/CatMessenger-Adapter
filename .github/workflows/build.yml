@@ -40,7 +40,7 @@ jobs:
         run: tar -czf CatMessenger.Core.tar.gz ./CatMessenger.Core/bin/Release/net8.0/publish
 
       - name: Upload CatMessenger.Core Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
@@ -54,7 +54,7 @@ jobs:
         run: tar -czf CatMessenger.Matrix.tar.gz ./CatMessenger.Matrix/bin/Release/net8.0/publish
 
       - name: Upload CatMessenger.Matrix Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
@@ -68,7 +68,7 @@ jobs:
         run: tar -czf CatMessenger.Telegram.tar.gz ./CatMessenger.Telegram/bin/Release/net8.0/publish
 
       - name: Upload CatMessenger.Telegram Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
