@@ -34,19 +34,36 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+      - name: Package artifacts
+        id: package_artifacts
+        run: chmod +x package-and-upload.sh && ./package-and-upload.sh
 
-      - name: Tar and Upload Release Assets
-        run: |
-          PROJECTS=("CatMessenger.Core" "CatMessenger.Matrix" "CatMessenger.Telegram")
-          for PROJECT in "${PROJECTS[@]}"; do
-            TAR_PATH="./${PROJECT}/bin/Release/net8.0/${PROJECT}.tar.gz"
-            tar -czf $TAR_PATH -C ./${PROJECT}/bin/Release/net8.0 publish
-            echo "Uploading ${PROJECT}.tar.gz..."
-            curl \
-              -X POST \
-              -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
-              -H "Content-Type: application/gzip" \
-              --data-binary @$TAR_PATH \
-              "${{ steps.create_release.outputs.upload_url }}?name=${PROJECT}.tar.gz"
-          done
-        shell: bash
+      - name: Upload CatMessenger.Core Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.package_artifacts.outputs.CatMessenger_Core_tar_path }}
+          asset_name: CatMessenger.Core.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload CatMessenger.Matrix Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.package_artifacts.outputs.CatMessenger_Matrix_tar_path }}
+          asset_name: CatMessenger.Matrix.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload CatMessenger.Telegram Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.package_artifacts.outputs.CatMessenger_Telegram_tar_path }}
+          asset_name: CatMessenger.Telegram.tar.gz
+          asset_content_type: application/gzip
