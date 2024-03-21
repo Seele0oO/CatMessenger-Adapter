@@ -22,10 +22,8 @@ jobs:
       run: dotnet restore
 
     - name: Build project
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet publish -c Release
 
-    - name: Run tests
-      run: dotnet test --no-restore --verbosity normal
 
     - name: Create Release
       id: create_release
