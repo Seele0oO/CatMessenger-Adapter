@@ -35,20 +35,6 @@ jobs:
           draft: false
           prerelease: false
 
-      # Tar and upload CatMessenger.Core artifacts
-      - name: Tar build CatMessenger.Core artifacts
-        run: tar -czf CatMessenger.Core.tar.gz ./CatMessenger.Core/bin/Release/net8.0/publish
-
-      - name: Upload CatMessenger.Core Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: CatMessenger.Core.tar.gz
-          asset_name: CatMessenger.Core.tar.gz
-          asset_content_type: application/gzip
-
       # Tar and upload CatMessenger.Matrix artifacts
       - name: Tar build CatMessenger.Matrix artifacts
         run: tar -czf CatMessenger.Matrix.tar.gz ./CatMessenger.Matrix/bin/Release/net8.0/publish
