@@ -235,6 +235,14 @@ public class UpdateMessageHelper
     {
         var message = new EmptyMessage();
 
+        if (entities.Length == 0)
+        {
+            return new TextMessage
+            {
+                Text = text
+            };
+        }
+
         var textCursor = 0;
         foreach (var entity in entities)
         {
