@@ -11,8 +11,6 @@ public abstract class PollingServiceBase<TReceiverService>(
     : BackgroundService
     where TReceiverService : IReceiverService
 {
-    private CancellationTokenSource Source { get; } = new();
-    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Starting polling service");
@@ -22,22 +20,19 @@ public abstract class PollingServiceBase<TReceiverService>(
 
     private async Task DoReceive(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested && !Source.IsCancellationRequested)
+        try
         {
-            try
-            {
-                // Fixme: qyl27: Maybe we needn't multi bot in same host?
-                using var scope = serviceProvider.CreateScope();
-                var receiver = scope.ServiceProvider.GetRequiredService<TReceiverService>();
-                // var receiver = ServiceProvider.GetService<TReceiverService>();
+            // Fixme: qyl27: Maybe we needn't multi bot in same host?
+            using var scope = serviceProvider.CreateScope();
+            var receiver = scope.ServiceProvider.GetRequiredService<TReceiverService>();
+            // var receiver = ServiceProvider.GetService<TReceiverService>();
                 
-                await receiver.ReceiveAsync(Source.Token);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Polling failed!");
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-            }
+            await receiver.ReceiveAsync(stoppingToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Polling failed!");
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
         }
     }
 }

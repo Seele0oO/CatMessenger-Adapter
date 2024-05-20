@@ -50,6 +50,7 @@ public class UpdateHandler(
 
     public Task OnCommand(Message message, string command, params string[] args)
     {
+        
         // if (command == "online")
         // {
         //     if (args.Length != 1)

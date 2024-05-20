@@ -40,7 +40,7 @@ public class MatrixClient : IHostedService
             Logger.LogInformation(args.Event.Type);
         };
 
-        Connector.OnMessage += message =>
+        Connector.MessageQueue.OnMessage += message =>
         {
             Bot.PostRoomMessage(Config.GetMatrixRoomId(), MessageHelper.ToMatrixPlain(message.Sender, message.Content), "");
         };

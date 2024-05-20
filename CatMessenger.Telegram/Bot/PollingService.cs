@@ -19,13 +19,13 @@ public class PollingService(
 {
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        connector.OnMessage += async message =>
+        await connector.Connect();
+        connector.MessageQueue.OnMessage += async message =>
         {
             await bot.SendTextMessageAsync(config.GetTelegramChatId(), MessageHelper.ToCombinedHtml(message),
                 parseMode: ParseMode.Html, cancellationToken: new CancellationToken());
         };
         
-        await connector.Connect();
         await bot.SendTextMessageAsync(config.GetTelegramChatId(), $"{config.GetName()} 适配器启动了！", cancellationToken: cancellationToken);
         await connector.Publish(new ConnectorMessage
         {
