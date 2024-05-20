@@ -32,6 +32,11 @@ public class UpdateHandler(
         //     connector.SendChatMessage(new ChatComponentPayload(message.ToString()));
         // }
 
+        if (update.Message != null && update.Message.Chat.Id != config.GetTelegramChatId())
+        {
+            return;
+        }
+        
         var message = UpdateMessageHelper.FromUpdate(update);
 
         if (config.IsDebug())

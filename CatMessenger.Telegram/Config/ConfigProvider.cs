@@ -30,9 +30,9 @@ public class ConfigProvider(IConfiguration config) : IConfigProvider
         return config.GetValue<string>("Telegram:Proxy:Url") ?? "";
     }
     
-    public string GetTelegramChatId()
+    public long GetTelegramChatId()
     {
-        return config.GetValue<string>("Telegram:ChatId")!;
+        return long.Parse(config.GetValue<string>("Telegram:ChatId")!);
     }
 
     public bool IsDebug()
