@@ -17,6 +17,15 @@ public class UpdateHandler(
     : IUpdateHandler
 {
     private string? Id { get; set; }
+
+    private static Random Random { get; } = new();
+
+    private static string[] Meow { get; } = [
+        "捕捉小猫猫~",
+        "喵？喵！",
+        "喵喵喵~",
+        "犬科动物什么时候才能站起来！"
+    ];
     
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
     {
@@ -76,7 +85,8 @@ public class UpdateHandler(
             await connector.Publish(new ConnectorCommand
             {
                 Command = ConnectorCommand.EnumCommand.QueryOnline,
-                Client = args[0]
+                Client = args[0],
+                ReplyTo = message.MessageId
             });
             await bot.SendTextMessageAsync(message.Chat.Id, "查询中，请稍候。", 
                 replyToMessageId: message.MessageId);
@@ -97,9 +107,15 @@ public class UpdateHandler(
             {
                 Command = ConnectorCommand.EnumCommand.QueryWorldTime,
                 Client = args[0], 
+                ReplyTo = message.MessageId,
                 Arguments = [world, typeStr]
             });
             await bot.SendTextMessageAsync(message.Chat.Id, "查询中，请稍候。", 
+                replyToMessageId: message.MessageId);
+        }
+        else if (command.StartsWith("meow"))
+        {
+            await bot.SendTextMessageAsync(message.Chat.Id, Meow[Random.Next(Meow.Length)], 
                 replyToMessageId: message.MessageId);
         }
     }

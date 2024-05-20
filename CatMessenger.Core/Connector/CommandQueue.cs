@@ -125,15 +125,12 @@ public class CommandQueue(IConfigProvider config, ILogger<RabbitMqConnector> log
             
             var message = JsonConvert.DeserializeObject<ConnectorCommand>(json);
 
-            if (message == null)
-            {
-                await Channel.BasicAckAsync(deliveryTag, false);
-                return;
-            }
-            
             try
             {
-                queue.OnCommand.Invoke(message, properties);
+                if (message != null)
+                {
+                    queue.OnCommand.Invoke(message, properties);
+                }
             }
             catch (Exception ex)
             {
