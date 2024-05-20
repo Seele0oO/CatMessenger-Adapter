@@ -32,10 +32,19 @@ public class PollingService(
             switch (command.Command)
             {
                 case ConnectorCommand.EnumCommand.ResponseOnline:
+                    if (int.Parse(command.Arguments[0]) > 0)
+                    {
+                        await bot.SendTextMessageAsync(config.GetTelegramChatId(), 
+                            $"<b>服务器 {command.Client} 有 {command.Arguments[0]} 位玩家在线：</b>\n{string.Join("\n", command.Arguments[1..])}", 
+                            replyToMessageId: command.ReplyTo, parseMode: ParseMode.Html, cancellationToken: new CancellationToken());
+                        return;
+                    }
+
                     await bot.SendTextMessageAsync(config.GetTelegramChatId(), 
-                        $"<b>服务器 {command.Client} 有 {command.Arguments[0]} 位玩家在线：</b>\n{string.Join("\n", command.Arguments[1..])}", 
+                        $"<b>服务器 {command.Client} 目前没人在线</b> :(", 
                         replyToMessageId: command.ReplyTo, parseMode: ParseMode.Html, cancellationToken: new CancellationToken());
                     return;
+
                 case ConnectorCommand.EnumCommand.ResponseWorldTime:
                     var time = int.Parse(command.Arguments[0]) switch
                     {
