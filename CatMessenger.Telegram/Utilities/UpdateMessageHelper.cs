@@ -254,8 +254,9 @@ public class UpdateMessageHelper
                 });
             }
 
-            if (entity.Offset == textCursor)
+            if (entity.Offset <= textCursor)
             {
+                continue;
                 // Todo: Not implemented.
                 // qyl27: For combined entities.
             }

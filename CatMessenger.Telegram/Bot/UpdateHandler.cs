@@ -24,6 +24,7 @@ public class UpdateHandler(
         "捕捉小猫猫~",
         "喵？喵！",
         "喵喵喵~",
+        "Meow~",
         "犬科动物什么时候才能站起来！"
     ];
     
