@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Encodings.Web;
 using CatMessenger.Core.Connector;
 using CatMessenger.Core.Message;
 using CatMessenger.Core.Message.MessageType;
@@ -28,16 +29,18 @@ public class MessageHelper
         {
             return string.Empty;
         }
-        
-        var result = new StringBuilder();
 
+        var result = new StringBuilder();
         if (message is TextMessage textMessage)
         {
-            result.Append(textMessage.Text);
+            var text = HtmlEncoder.Default.Encode(textMessage.Text);
+            result.Append(text);
         }
         if (message is TranslatableMessage translatableMessage)
         {
-            result.Append(string.Format(translatableMessage.Key, translatableMessage.Args.Select<string, object?>(s => s).ToArray()));
+            var text = string.Format(translatableMessage.Key, translatableMessage.Args.Select<string, object?>(s => s).ToArray());
+            text = HtmlEncoder.Default.Encode(text);
+            result.Append(text);
         }
         if (message is NewlineMessage newlineMessage)
         {
