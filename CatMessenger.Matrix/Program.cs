@@ -22,7 +22,6 @@ builder.Logging.ClearProviders()
 
 var config = new ConfigManager(builder.Configuration);
 builder.Services.AddSingleton<IConfigProvider>(config);
-builder.Services.AddSingleton(config);
 
 builder.Services.AddSingleton<RabbitMqConnector>();
 builder.Services.AddHostedService<MatrixClient>();

@@ -24,7 +24,6 @@ builder.Logging.ClearProviders()
 
 var config = new ConfigProvider(builder.Configuration);
 builder.Services.AddSingleton<IConfigProvider>(config);
-builder.Services.AddSingleton(config);
 
 builder.Services.AddHttpClient("TelegramBotClient")
     .ConfigurePrimaryHttpMessageHandler(() =>
