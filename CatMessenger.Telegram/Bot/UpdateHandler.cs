@@ -86,7 +86,8 @@ public class UpdateHandler(
             await connector.Publish(new ConnectorCommand
             {
                 Command = ConnectorCommand.EnumCommand.QueryOnline,
-                Client = args[0],
+                Sender = config.GetName(),
+                Callback = args[0],
                 ReplyTo = message.MessageId
             });
             await bot.SendTextMessageAsync(message.Chat.Id, "查询中，请稍候。", 
@@ -107,7 +108,8 @@ public class UpdateHandler(
             await connector.Publish(new ConnectorCommand
             {
                 Command = ConnectorCommand.EnumCommand.QueryWorldTime,
-                Client = args[0], 
+                Sender = config.GetName(),
+                Callback = args[0],
                 ReplyTo = message.MessageId,
                 Arguments = [world, typeStr]
             });

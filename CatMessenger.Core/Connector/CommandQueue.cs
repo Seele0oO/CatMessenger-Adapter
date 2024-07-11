@@ -42,7 +42,7 @@ public class CommandQueue(IConfigProvider config, ILogger<RabbitMqConnector> log
     public async Task Publish(ConnectorCommand message)
     {
         var json = JsonConvert.SerializeObject(message);
-        await InternalPublish(json, $"{message.Client}_command", 0);
+        await InternalPublish(json, $"{message.Callback}_command", 0);
     }
     
     public async Task Reply(ReadOnlyBasicProperties props, params string[] message)

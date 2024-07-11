@@ -4,8 +4,11 @@ namespace CatMessenger.Core.Connector;
 
 public class ConnectorCommand
 {
-    [JsonProperty("client")]
-    public string Client { get; set; }
+    [JsonProperty("sender")]
+    public string Sender { get; set; }
+    
+    [JsonProperty("callback")]
+    public string Callback { get; set; }
     
     [JsonProperty("command")]
     public EnumCommand Command { get; set; }

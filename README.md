@@ -1,1 +1,1 @@
-# CatMessenger.Matrix
+# CatMessenger Adapter
