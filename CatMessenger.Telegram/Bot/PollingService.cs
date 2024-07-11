@@ -51,15 +51,23 @@ public class PollingService(
                     return;
 
                 case ConnectorCommand.EnumCommand.ResponseWorldTime:
-                    var time = int.Parse(command.Arguments[0]) switch
+                    var time = int.Parse(command.Arguments[0]);
+                    if (time < 0)
                     {
-                        > 0 and < 12000 => "白天☀️",
-                        > 12000 and < 24000 => "夜晚🌙",
+                        await bot.SendTextMessageAsync(config.GetTelegramChatId(), 
+                            $"<b>服务器 {command.Sender} 认为查询条件错误。</b>", 
+                            replyToMessageId: command.ReplyTo, cancellationToken: new CancellationToken());
+                        return;
+                    }
+                    
+                    var timeStr = time switch
+                    {
+                        >= 0 and <= 12000 => "白天☀️",
+                        > 12000 and <= 24000 => "夜晚🌙",
                         _ => "奇奇怪怪的时间"
                     };
-
                     await bot.SendTextMessageAsync(config.GetTelegramChatId(), 
-                        $"<b>服务器 {command.Sender} 的主世界现在是：</b>{time}", 
+                        $"<b>服务器 {command.Sender} 的主世界现在是：</b>{timeStr}", 
                         replyToMessageId: command.ReplyTo, cancellationToken: new CancellationToken());
                     return;
                 case ConnectorCommand.EnumCommand.Error:
