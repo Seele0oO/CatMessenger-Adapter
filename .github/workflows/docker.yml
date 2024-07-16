@@ -34,7 +34,7 @@ jobs:
           platforms: linux/amd64
           file: CatMessenger.Telegram/Dockerfile
           push: true
-          tags: docker.io/${{ vars.DOCKERHUB_USERNAME }}/catmessenger-telegram:latest
+          tags: docker.io/${{ vars.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
 
   build-matrix:
     runs-on: ubuntu-latest
@@ -64,4 +64,4 @@ jobs:
           context: .
           file: CatMessenger.Matrix/Dockerfile
           push: true
-          tags: docker.io/${{ vars.DOCKERHUB_USERNAME }}/catmessenger-matrix:latest
+          tags: docker.io/${{ vars.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
