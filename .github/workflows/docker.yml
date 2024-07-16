@@ -1,76 +1,66 @@
-{
-  "name": "Build and Release on Tag",
-  "on": { "push": { "tags": ["v*"] } },
-  "env": { "DOCKERHUB_USERNAME": "${{ secrets.DOCKERHUB_USERNAME }}" },
-  "jobs":
-    {
-      "setup":
-        {
-          "runs-on": "ubuntu-latest",
-          "steps":
-            [
-              { "name": "Checkout repository", "uses": "actions/checkout@v2" },
-              {
-                "name": "Set up QEMU",
-                "uses": "docker/setup-qemu-action@v3",
-                "with": { "platforms": "all" },
-              },
-              {
-                "name": "Set up Docker Buildx",
-                "uses": "docker/setup-buildx-action@v3",
-              },
-              {
-                "name": "Log in to Docker Hub",
-                "uses": "docker/login-action@v3",
-                "with":
-                  {
-                    "username": "${{ secrets.DOCKERHUB_USERNAME }}",
-                    "password": "${{ secrets.DOCKERHUB_TOKEN }}",
-                  },
-              },
-            ],
-        },
-      "build-telegram":
-        {
-          "runs-on": "ubuntu-latest",
-          "needs": "setup",
-          "steps":
-            [
-              { "name": "Checkout repository", "uses": "actions/checkout@v2" },
-              {
-                "name": "Build and push CatMessenger.Telegram image",
-                "uses": "docker/build-push-action@v4",
-                "with":
-                  {
-                    "context": ".",
-                    "file": "./Dockerfile.Telegram",
-                    "platforms": "linux/amd64,linux/arm64",
-                    "push": true,
-                    "tags": "${{ env.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}",
-                  },
-              },
-            ],
-        },
-      "build-matrix":
-        {
-          "runs-on": "ubuntu-latest",
-          "needs": "setup",
-          "steps":
-            [
-              { "name": "Checkout repository", "uses": "actions/checkout@v2" },
-              {
-                "name": "Build and push CatMessenger.Matrix image",
-                "uses": "docker/build-push-action@v4",
-                "with":
-                  {
-                    "context": ".",
-                    "file": "./Dockerfile.Matrix",
-                    "platforms": "linux/amd64,linux/arm64",
-                    "push": true,
-                    "tags": "${{ env.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}",
-                  },
-              },
-            ],
-        },
-    },
-}
+name: Build Docker on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  build-telegram:
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+
+      - 
+        name: Build and push CatMessenger.Telegram image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: CatMessenger.Telegram/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
+
+  build-matrix:
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build and push CatMessenger.Matrix image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: CatMessenger.Matrix/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
