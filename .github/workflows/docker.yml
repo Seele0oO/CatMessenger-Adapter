@@ -51,7 +51,7 @@ jobs:
         with:
           context: .
           file: CatMessenger.Telegram/Dockerfile
-          platforms: linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
 
@@ -68,6 +68,6 @@ jobs:
         with:
           context: .
           file: CatMessenger.Matrix/Dockerfile
-          platforms: linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
