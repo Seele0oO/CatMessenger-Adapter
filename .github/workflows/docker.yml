@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 env:
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
 
 jobs:
   setup:
@@ -33,7 +33,7 @@ jobs:
         name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
   build-telegram:
@@ -53,7 +53,7 @@ jobs:
           file: CatMessenger.Telegram/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
+          tags: docker.io/${{ vars.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
 
   build-matrix:
     runs-on: ubuntu-latest
@@ -70,4 +70,4 @@ jobs:
           file: CatMessenger.Matrix/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
+          tags: docker.io/${{ vars.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
