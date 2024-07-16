@@ -14,9 +14,6 @@ jobs:
 
     steps:
       -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - 
@@ -48,8 +45,7 @@ jobs:
         name: Build and push CatMessenger.Telegram image
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: CatMessenger.Telegram/Dockerfile
+          context: CatMessenger.Telegram
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
@@ -60,13 +56,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Build and push CatMessenger.Matrix image
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: CatMessenger.Matrix/Dockerfile
+          context: CatMessenger.Matrix
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
