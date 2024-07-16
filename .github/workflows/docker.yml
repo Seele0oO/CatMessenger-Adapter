@@ -53,7 +53,7 @@ jobs:
           file: CatMessenger.Telegram/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
+          tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/catmessenger-telegram:${{ github.ref_name }}
 
   build-matrix:
     runs-on: ubuntu-latest
@@ -70,4 +70,4 @@ jobs:
           file: CatMessenger.Matrix/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
+          tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/catmessenger-matrix:${{ github.ref_name }}
