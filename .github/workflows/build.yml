@@ -31,10 +31,14 @@ jobs:
       - name: Tar build artifacts
         run: tar -czf ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz -C public/${{ matrix.os }}-${{ matrix.arch }} .
 
+      - name: Replace invalid characters in ref
+        id: replace_ref
+        run: echo "cleaned_ref=${GITHUB_REF//\//-}" >> $GITHUB_ENV
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: artifacts-CatMessager-${{ github.ref }}
+          name: artifacts-CatMessager-${{ env.cleaned_ref }}
           path: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
 
 
@@ -42,10 +46,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Replace invalid characters in ref
+        id: replace_ref
+        run: echo "cleaned_ref=${GITHUB_REF//\//-}" >> $GITHUB_ENV
       - name: Download build artifacts
         uses: actions/download-artifact@v2
         with:
-          path: '/artifacts-CatMessager-${{ github.ref }}'
+          path: artifacts-CatMessager-${{ env.cleaned_ref }}
       
       - name: Create Release
         id: create_release
