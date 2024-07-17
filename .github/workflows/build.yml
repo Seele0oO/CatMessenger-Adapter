@@ -4,11 +4,10 @@ on:
   push:
     tags:
       - 'v*'
-
 env:
-  PROJECTS: '["CatMessenger.Matrix", "CatMessenger.Telegram"]'
-  OS: '["linux"]'
-  ARCHS: '["amd64", "arm64"]'
+  PROJECTS: 'CatMessenger.Matrix,CatMessenger.Telegram'
+  OS: 'linux'
+  ARCHS: 'amd64,arm64'
 
 jobs:
   set-env-vars:
@@ -21,10 +20,10 @@ jobs:
 
       - id: set-matrix
         run: |
-          projects=${{ env.PROJECTS }}
-          os=${{ env.OS }}
-          arch=${{ env.ARCHS }}
-          matrix=$(jq -n --argjson projects "$projects" --argjson os "$os" --argjson arch "$arch" \
+          projects=(${PROJECTS//,/ })
+          os=(${OS//,/ })
+          arch=(${ARCHS//,/ })
+          matrix=$(jq -n --argjson projects "$(printf '%s\n' "${projects[@]}" | jq -R . | jq -s .)" --argjson os "$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)" --argjson arch "$(printf '%s\n' "${arch[@]}" | jq -R . | jq -s .)" \
           '{
             include: [
               ($projects | map({project: ., os: $os[0], arch: $arch[0]})),
