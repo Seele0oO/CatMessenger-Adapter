@@ -34,8 +34,9 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-          path: /${{ github.ref }}
+          name: artifacts-CatMessager-${{ github.ref }}
+          path: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+
 
   release:
     needs: build
@@ -44,7 +45,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v2
         with:
-          path: '/${{ github.ref }}/*.tar.gz'
+          path: '/artifacts-CatMessager-${{ github.ref }}'
       
       - name: Create Release
         id: create_release
