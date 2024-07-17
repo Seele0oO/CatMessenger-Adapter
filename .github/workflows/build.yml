@@ -37,8 +37,7 @@ jobs:
             ] | add
           }')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-      
-
+          
   build:
     needs: set-env-vars
     runs-on: ubuntu-latest
