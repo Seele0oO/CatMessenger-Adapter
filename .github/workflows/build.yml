@@ -14,6 +14,10 @@ env:
 jobs:
   set-env-vars:
     runs-on: ubuntu-latest
+    env:
+      PROJECTS: '["CatMessenger.Matrix", "CatMessenger.Telegram"]'
+      OS: '["linux"]'
+      ARCH: '["amd64", "arm64"]'
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -22,9 +26,9 @@ jobs:
 
       - id: set-matrix
         run: |
-          projects='["CatMessenger.Matrix", "CatMessenger.Telegram"]'
-          os='["linux"]'
-          arch='["amd64", "arm64"]'
+          projects=${{ env.PROJECTS }}
+          os=${{ env.OS }}
+          arch=${{ env.ARCH }}
           matrix=$(jq -n --argjson projects "$projects" --argjson os "$os" --argjson arch "$arch" \
           '{
             include: [
