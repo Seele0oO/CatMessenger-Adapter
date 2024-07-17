@@ -8,7 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        project: [CatMessenger.Telegram]
+        os: [linux]
+        arch: [amd64, arm64]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -19,46 +23,41 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./${{ matrix.project }}/${{ matrix.project }}.csproj
 
       - name: Build project
-        run: dotnet publish -c Release
+        run: dotnet publish ./${{ matrix.project }}/${{ matrix.project }}.csproj -c Release -r ${{ matrix.os }}-${{ matrix.arch }} -p:PublishSingleFile=true -o public/${{ matrix.os }}-${{ matrix.arch }}
 
+      - name: Tar build artifacts
+        run: tar -czf ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz -C public/${{ matrix.os }}-${{ matrix.arch }} .
+
+      - name: Replace invalid characters in ref
+        id: replace_ref
+        run: echo "cleaned_ref=${GITHUB_REF//\//-}" >> $GITHUB_ENV
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts-CatMessager-${{ env.cleaned_ref }}
+          path: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Replace invalid characters in ref
+        id: replace_ref
+        run: echo "cleaned_ref=${GITHUB_REF//\//-}" >> $GITHUB_ENV
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: .
+      
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'artifacts-CatMessager-${{ env.cleaned_ref }}/*.tar.gz'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      # Tar and upload CatMessenger.Matrix artifacts
-      - name: Tar build CatMessenger.Matrix artifacts
-        run: tar -czf CatMessenger.Matrix.tar.gz ./CatMessenger.Matrix/bin/Release/net8.0/publish
-
-      - name: Upload CatMessenger.Matrix Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: CatMessenger.Matrix.tar.gz
-          asset_name: CatMessenger.Matrix.tar.gz
-          asset_content_type: application/gzip
-
-      # Tar and upload CatMessenger.Telegram artifacts
-      - name: Tar build CatMessenger.Telegram artifacts
-        run: tar -czf CatMessenger.Telegram.tar.gz ./CatMessenger.Telegram/bin/Release/net8.0/publish
-
-      - name: Upload CatMessenger.Telegram Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: CatMessenger.Telegram.tar.gz
-          asset_name: CatMessenger.Telegram.tar.gz
-          asset_content_type: application/gzip
