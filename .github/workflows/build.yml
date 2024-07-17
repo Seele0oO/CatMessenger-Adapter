@@ -11,7 +11,8 @@ jobs:
 
     strategy:
       matrix:
-        project: [CatMessenger.Matrix, CatMessenger.Telegram]
+        # project: [CatMessenger.Matrix, CatMessenger.Telegram]
+        project: [CatMessenger.Telegram]
         os: [linux]
         arch: [amd64, arm64]
 
