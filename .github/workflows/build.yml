@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,28 +34,22 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}
-          path: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+          name: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+          path: /${{ github.ref }}
 
   release:
-    needs: build-and-publish
+    needs: build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project: [CatMessenger.Telegram]
-        os: [linux]
-        arch: [amd64, arm64]
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v2
         with:
-          name: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}
-          path: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-
+          path: '/${{ github.ref }}/*.tar.gz'
+      
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+          files: '/${{ github.ref }}/*.tar.gz'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
