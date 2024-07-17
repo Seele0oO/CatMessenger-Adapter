@@ -5,16 +5,41 @@ on:
     tags:
       - 'v*'
 
-jobs:
-  build_and_release:
-    runs-on: ubuntu-latest
+env:
+  PROJECTS: '["CatMessenger.Matrix", "CatMessenger.Telegram"]'
+  OS: '["linux"]'
+  ARCHS: '["amd64", "arm64"]'
 
+jobs:
+  set-env-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - id: set-matrix
+        run: |
+          projects=${{ env.PROJECTS }}
+          os=${{ env.OS }}
+          arch=${{ env.ARCHS }}
+          matrix=$(jq -n --argjson projects "$projects" --argjson os "$os" --argjson arch "$arch" \
+          '{
+            include: [
+              ($projects | map({project: ., os: $os[0], arch: $arch[0]})),
+              ($projects | map({project: ., os: $os[0], arch: $arch[1]}))
+            ] | add
+          }')
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build:
+    needs: set-env-vars
+    runs-on: ubuntu-latest
     strategy:
-      matrix:
-        # project: [CatMessenger.Matrix, CatMessenger.Telegram]
-        project: [CatMessenger.Telegram]
-        os: [linux]
-        arch: [amd64, arm64]
+      matrix: ${{ fromJSON(needs.set-env-vars.outputs.matrix) }}
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
     steps:
       - name: Checkout repository
@@ -34,9 +59,28 @@ jobs:
       - name: Tar build artifacts
         run: tar -czf ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz -C public/${{ matrix.os }}-${{ matrix.arch }} .
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ matrix.project }}-${{ matrix.os }}}-${{ matrix.arch }}.tar.gz
+
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           files: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
         env:
