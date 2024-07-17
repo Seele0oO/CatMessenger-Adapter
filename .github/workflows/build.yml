@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  build_and_release:
     runs-on: ubuntu-latest
 
     strategy:
@@ -31,37 +31,13 @@ jobs:
       - name: Build project
         run: dotnet publish ./${{ matrix.project }}/${{ matrix.project }}.csproj -c Release -r ${{ matrix.os }}-${{ matrix.arch }} -p:PublishSingleFile=true -o public/${{ matrix.os }}-${{ matrix.arch }}
 
-  create_release_and_upload:
-    needs: build
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        project: [CatMessenger.Matrix, CatMessenger.Telegram]
-        os: [linux]
-        arch: [amd64, arm64]
-
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
       - name: Tar build artifacts
         run: tar -czf ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz -C public/${{ matrix.os }}-${{ matrix.arch }} .
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-          asset_name: ${{ matrix.project }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-          asset_content_type: application/gzip
