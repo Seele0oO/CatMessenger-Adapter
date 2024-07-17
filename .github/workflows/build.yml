@@ -23,20 +23,19 @@ jobs:
           projects=(${PROJECTS//,/ })
           os=(${OS//,/ })
           arch=(${ARCHS//,/ })
+          projects_json=$(printf '%s\n' "${projects[@]}" | jq -R . | jq -s .)
+          os_json=$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)
+          arch_json=$(printf '%s\n' "${arch[@]}" | jq -R . | jq -s .)
           matrix=$(jq -n \
-          --arg projects "${PROJECTS}" \
-          --arg os "${OS}" \
-          --arg arch "${ARCHS}" \
-          '{
-            include: (
-              $projects | split(",") as $projects |
-              $os | split(",") as $os |
-              $arch | split(",") as $arch |
-              [ $projects[], $os[], $arch[] ] | 
-              combinations | 
-              map({project: .[0], os: .[1], arch: .[2]})
-            )
-          }')
+            --argjson projects "$projects_json" \
+            --argjson os "$os_json" \
+            --argjson arch "$arch_json" \
+            '{
+              include: [
+                ($projects | map({project: ., os: $os[0], arch: $arch[0]})),
+                ($projects | map({project: ., os: $os[0], arch: $arch[1]}))
+              ] | add
+            }')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
   build-and-publish:
