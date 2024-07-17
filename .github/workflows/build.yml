@@ -5,6 +5,7 @@ on:
     tags:
       - 'v*'
 
+
 env:
   PROJECTS: '["CatMessenger.Matrix", "CatMessenger.Telegram"]'
   OS: '["linux"]'
@@ -21,9 +22,9 @@ jobs:
 
       - id: set-matrix
         run: |
-          projects=${{ env.PROJECTS }}
-          os=${{ env.OS }}
-          arch=${{ env.ARCHS }}
+          projects='["CatMessenger.Matrix", "CatMessenger.Telegram"]'
+          os='["linux"]'
+          arch='["amd64", "arm64"]'
           matrix=$(jq -n --argjson projects "$projects" --argjson os "$os" --argjson arch "$arch" \
           '{
             include: [
@@ -32,6 +33,7 @@ jobs:
             ] | add
           }')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
+      
 
   build:
     needs: set-env-vars
