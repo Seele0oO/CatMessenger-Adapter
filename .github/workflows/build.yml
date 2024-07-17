@@ -4,45 +4,15 @@ on:
   push:
     tags:
       - 'v*'
-env:
-  PROJECTS: 'CatMessenger.Matrix,CatMessenger.Telegram'
-  OS: 'linux'
-  ARCHS: 'amd64,arm64'
 
 jobs:
-  set-env-vars:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
-      - id: set-matrix
-        run: |
-          projects=(${PROJECTS//,/ })
-          os=(${OS//,/ })
-          arch=(${ARCHS//,/ })
-          projects_json=$(printf '%s\n' "${projects[@]}" | jq -R . | jq -s .)
-          os_json=$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)
-          arch_json=$(printf '%s\n' "${arch[@]}" | jq -R . | jq -s .)
-          matrix=$(jq -n \
-            --argjson projects "$projects_json" \
-            --argjson os "$os_json" \
-            --argjson arch "$arch_json" \
-            '{
-              include: [
-                ($projects | map({project: ., os: $os[0], arch: $arch[0]})),
-                ($projects | map({project: ., os: $os[0], arch: $arch[1]}))
-              ] | add
-            }')
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
-
   build-and-publish:
-    needs: set-env-vars
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.set-env-vars.outputs.matrix) }}
+      matrix:
+        project: [CatMessenger.Telegram]
+        os: [linux]
+        arch: [amd64, arm64]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -71,8 +41,10 @@ jobs:
     needs: build-and-publish
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.set-env-vars.outputs.matrix) }}
-
+      matrix:
+        project: [CatMessenger.Telegram]
+        os: [linux]
+        arch: [amd64, arm64]
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v2
