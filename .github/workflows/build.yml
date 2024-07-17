@@ -58,6 +58,6 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: '/artifacts-CatMessager-${{ env.cleaned_ref }}/*.tar.gz'
+          files: 'artifacts-CatMessager-${{ env.cleaned_ref }}/*.tar.gz'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
